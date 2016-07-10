@@ -12,12 +12,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class TransformerTest extends PHPUnit_Framework_TestCase
 {
 
-
-
     protected $responder;
+    protected $testData;
 
     public function setUp() {
         $this->responder = new ResponseCaller;
+        $this->testData = [
+            'data'=>[
+                'name'=>'data',
+                'default'=>[ 'name'=>'Include default' ],
+            ]
+        ];
     }
 
     /**
@@ -39,20 +44,30 @@ class TransformerTest extends PHPUnit_Framework_TestCase
             ]
         ]), $response->getContent() );
     }
+
     public function test_include_available_includes_when_get_include_parameter_is_set() {
 
         $_GET[ 'include' ] = 'available';
 
+        // Modify data
+        $this->testData[ 'data' ][ 'available' ] = [ 'name'=>'Include available' ];
+
         $response = $this->responder->response->item( [ 'name'=>'data' ], new Transformer );
-        var_dump( $response );
+        $this->assertJsonStringEqualsJsonString( json_encode( $this->testData ), $response->getContent() );
+
+        $_GET[ 'include' ] = null;
+
+    }
+
+    public function test_get_collection() {
+
+        $response = $this->responder->response->collection( [ [ 'name'=>'data' ], [ 'name'=>'data' ] ], new Transformer );
         $this->assertJsonStringEqualsJsonString( json_encode([
             'data'=>[
-                'name'=>'data',
-                'default'=>[ 'name'=>'Include default' ],
-                'available'=>[ 'name'=>'Include available' ],
+                $this->testData[ 'data' ],
+                $this->testData[ 'data' ],
             ]
         ]), $response->getContent() );
-
     }
 
 }
