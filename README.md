@@ -1,101 +1,100 @@
-# image-handler
-PHP image handler gives easy to use function for manipulating images
+# api-response
+> Helper class for giving JSON api response
 
 ## Motivation
+Its hard to allways write api response for everyting, and this package will make the job much easier.
 
-Resizing and cropping images on web is pain, and i wanted an image-engine that does this for me.
+This package and its base concept is greatly inspired by [dingo/api](https://github.com/dingo/api).
+And uses most of the same transformer syntax as [Fractal](http://fractal.thephpleague.com/transformers/).
 
-This package and its base concept is greatly inspired by [Croppa](https://github.com/BKWLD/croppa).
-
-## Usage
+## Install
 I use this package mainly in my [Laravel](https://laravel.com/) projects.
 
-Run ```composer require lassehaslev/image``` in your project folder
+Run ```composer require lassehaslev/api-response``` in your project folder
 
-#### Laravel
-If you want to use this package in you laravel project. We automaticly crops and resize the images based on the filename.
-
-Open ```config/app.php``` and add ```LasseHaslev\Image\Providers\LaravelServiceProvider::class``` to ```providers``` array.
-
-## Classes
-You can nativly use this package in all php projects.
-
-#### CropHandler
-Adds base folder and crops folder and handle image from image path.
-
-If no crops folder is set, we crate crops in same folder as original.
-```
-$baseFolder = '/image';
-$cropsFolder = '/image/crops';
-$handler = CropHandler::create( $baseFolder, $cropsFolder );
-
-$this->handler
-    ->handle( [
-        'name'=>'test-image.jpg',
-        'width'=>89,
-        'height'=>89,
-        'resize'=>true,
-    ] )
-    ->save( 'test-image-89x89-resize.jpg' );
-```
-
-#### Adaptors
-You can use adapotors to handle image.
-```
-class Adaptor implements CropAdaptorInterface
+## Usage
+#### Responder
+The Responder is where we call what items we want transformed to JsonResponse. This class need to implement the ```ResponseTrait``` and will then make the ```$this->response``` object available. This will make it posible to use ```$response->item()``` and ```$response->collection()```.
+The first argument for both functions are the data to be transformed, the second argument is the transformer to transform the data. Read below for more information.
+``` php
+use LasseHaslev\ApiResponse\Responses\ResponseTrait;
+class ResponseCaller
 {
-    public function transform( $input, $handler = null )
+    use ResponseTrait;
+
+    public function getItem() {
+        return $this->response->item( [ 'name'=>'Test name' ], new Transformer );
+    }
+
+    public function getCollection() {
+        return $this->response->collection( [
+            [ 'name'=>'Test name' ],
+            [ 'name'=>'Another test name' ]
+        ], new Transformer );
+    }
+
+}
+```
+
+#### Transformer
+The transformer is where we format the data to the api.
+All you have to do is to create a ```public function transform``` with the model you want to transformed.
+Then you return an ```array``` with the data.
+
+You can also have the transformer include more data. This can be useful when model has data. 
+This is done by two different types ```default``` and ```available```, but both types works the same way:
+Update the array of the type example: ```protected $defaultIncludes = ['name']```.
+Then you need to create a public function thats has name prefix ```include```. Example: ```public function includeName( $model )```.
+
+###### Default includes
+The default include will be included by default.
+
+###### Available includes
+The available include will only be included when url parameter ```include``` are provided. Example ```/api/request?include=name```
+
+If you have multiple available includes you can include them by having url request like ```/api/request?include=first,second```
+
+``` php
+use LasseHaslev\ApiResponse\Transformers\Transformer as BaseTransformer;
+class Transformer extends BaseTransformer
+{
+
+    protected $defaultIncludes = [ 'default' ];
+    protected $availableIncludes = [ 'available' ];
+
+    /**
+     * Transform $model
+     *
+     * @return Array
+     */
+    public function transform( $model )
     {
         return [
-            'name'=>$input,
-            'width'=>300,
-            'height'=>200,
-            'resize'=>true,
+            'name'=>$model[ 'name' ],
         ];
     }
+
+    /**
+     * Return include default
+     *
+     * @return Array
+     */
+    public function includeDefault($model)
+    {
+        return [ 'name'=>'Include default' ];
+    }
+
+    /**
+     * Return include available
+     *
+     * @return Array
+     */
+    public function includeAvailable($model)
+    {
+        return [ 'name'=>'Include available' ];
+    }
+
 }
-$baseFolder = '/image';
-$cropsFolder = '/image/crops';
-$handler = CropHandler::create( $baseFolder, $cropsFolder, new Adaptor );
-
-$this->handler
-    ->handle( 'originalFilename.jpg' )
-    ->save( 'newFilename' );
-```
-#### ImageModifier
-The ```ImageModifier``` is the base image class for manipulating the images. 
-```
-use LasseHaslev\Image\Modifiers\ImageModifier;
-$modifier = ImageModifier::create( { absolute image path } );
-
-// Crop image function
-$modifier->crop( $x1, $y1, $x2, $y2 );
-
-// Crop image to width and height based on fucuspoint
-$modifier->cropToFit( $width, $height, $focusPointX = 0, $focusPointY = 0 );
-
-// Resize width and height
-$modifier->resize( $width, $height );
-
-// Save the new image
-$modifier->save( {absolutePath} );
-
-// Example
-$modifier->cropToFit( 300, 300 )
-    ->save( '/path/to/image.jpg' );
-```
-
-#### ImageHandler
-The ImageHandler is for handling image and the crops. It extends from ```ImageModifier```.
-```
-use LasseHaslev\Image\Handlers\ImageHandler;
-$modifier = ImageHandler::create( $filepath );
-
-// Remove the crops
-$modifier->removeCrops();
-
-// Save
-$modifier->save( $pathOrFilename, $isFullPath = false );
 ```
 
 ## License
