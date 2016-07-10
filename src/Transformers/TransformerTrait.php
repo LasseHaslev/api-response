@@ -142,11 +142,8 @@ trait TransformerTrait
     protected function includeAvailableIncludes($model, $data )
     {
 
-        // Get the request instance
-        $request = app( Request::class );
-
-        // create array from the all,the,words string
-        $includes = explode( ',',  $request->get( 'include' ) );
+        // Get available includes from url parameters
+        $includes = $this->getAvailableIncludesFromUrlParameters();
 
         // Create an return array
         $returnData = [];
@@ -187,6 +184,16 @@ trait TransformerTrait
 
         return $this->{$functionName}( $model );
 
+    }
+
+    /**
+     * Get available includes from url parameters
+     *
+     * @return Array
+     */
+    protected function getAvailableIncludesFromUrlParameters()
+    {
+        return isset( $_GET[ 'include' ] ) ? explode( ',', $_GET[ 'include' ] ) : [];
     }
 
 }

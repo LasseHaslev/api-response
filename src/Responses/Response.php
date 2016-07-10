@@ -2,6 +2,8 @@
 
 namespace LasseHaslev\ApiResponse\Responses;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 /**
  * Class Responder
  * @author Lasse S. Haslev
@@ -35,13 +37,13 @@ class Response
 
 
     /**
-     * Respond function
+     * Respond with JsonResponse
      *
-     * @return Response
+     * @return Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function respond( $data, int $status = 200 )
     {
-        return response()->json( $data, $status );
+        return JsonResponse::create( $data, $status );
     }
 
 

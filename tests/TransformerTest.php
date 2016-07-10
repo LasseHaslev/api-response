@@ -1,7 +1,9 @@
 <?php
 
-use LasseHaslev\ApiResponse\Transformers\TransformerTrait;
 use LasseHaslev\ApiResponse\Responses\ResponseTrait;
+use LasseHaslev\ApiResponse\Transformers\Transformer as TransformerBase;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class DontKnowTest
@@ -10,24 +12,48 @@ use LasseHaslev\ApiResponse\Responses\ResponseTrait;
 class TransformerTest extends PHPUnit_Framework_TestCase
 {
 
-    protected $test;
+
+
+    protected $responder;
 
     public function setUp() {
-        $this->test = new ResponseCaller;
+        $this->responder = new ResponseCaller;
     }
 
     /**
-     * Transform returns array
+     * Transform return JsonResponse
      */
-    public function test_transform_returns_array() {
+    public function test_transform_returns_json_response() {
 
-        var_dump( $this->test->response->item( [ 'name'=>'data' ], new Transformer ) );
+        $response = $this->responder->response->item( [ 'name'=>'data' ], new Transformer );
+        $this->assertInstanceOf( JsonResponse::class, $response );
 
     }
-    public function test_formats_array_output() {}
-    public function test_include_includes_on_() {}
-    public function test_include_default_includes() {}
-    public function test_include_available_includes_when_get_include_parameter_is_set() {}
+
+    public function test_include_default_includes() {
+        $response = $this->responder->response->item( [ 'name'=>'data' ], new Transformer );
+        $this->assertJsonStringEqualsJsonString( json_encode([
+            'data'=>[
+                'name'=>'data',
+                'default'=>[ 'name'=>'Include default' ],
+            ]
+        ]), $response->getContent() );
+    }
+    public function test_include_available_includes_when_get_include_parameter_is_set() {
+
+        $_GET[ 'include' ] = 'available';
+
+        $response = $this->responder->response->item( [ 'name'=>'data' ], new Transformer );
+        var_dump( $response );
+        $this->assertJsonStringEqualsJsonString( json_encode([
+            'data'=>[
+                'name'=>'data',
+                'default'=>[ 'name'=>'Include default' ],
+                'available'=>[ 'name'=>'Include available' ],
+            ]
+        ]), $response->getContent() );
+
+    }
 
 }
 
@@ -37,7 +63,7 @@ class ResponseCaller
     use ResponseTrait;
 }
 
-class Transformer
+class Transformer extends TransformerBase
 {
 
     protected $defaultIncludes = [ 'default' ];
@@ -50,7 +76,27 @@ class Transformer
      */
     public function transform( $model )
     {
-        return $model->attributes();
+        return $model;
+    }
+
+    /**
+     * Return include default
+     *
+     * @return Array
+     */
+    public function includeDefault($model)
+    {
+        return [ 'name'=>'Include default' ];
+    }
+
+    /**
+     * Return include available
+     *
+     * @return Array
+     */
+    public function includeAvailable($model)
+    {
+        return [ 'name'=>'Include available' ];
     }
 
 }

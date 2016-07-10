@@ -2,6 +2,8 @@
 
 namespace LasseHaslev\ApiResponse\Responses;
 
+use LasseHaslev\ApiResponse\Responses\Response;
+
 /**
  * Trait Responder
  * @author Lasse S. Haslev
@@ -13,6 +15,8 @@ trait ResponseTrait
 
     protected $respond;
 
+    protected $response;
+
     /**
      * Get the response factory instance
      *
@@ -20,7 +24,12 @@ trait ResponseTrait
      */
     protected function response()
     {
-        return app( 'LasseHaslev\ApiResponse\Response\Response' );
+        if ( $this->response ) {
+            return $this->response;
+        }
+        $this->response = new Response;
+
+        return $this->response;
     }
 
 
