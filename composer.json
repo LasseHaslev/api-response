@@ -1,5 +1,6 @@
 {
     "name": "lassehaslev/api-response",
+    "description": "Helper class for giving JSON api response",
     "license": "MIT",
     "authors": [
         {
