@@ -4,3 +4,4 @@ vendor/
 tags
 images/
 images/tests/
+composer.lock
