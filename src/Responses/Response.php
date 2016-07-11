@@ -18,7 +18,7 @@ class Response
      *
      * @return Response
      */
-    public function item($model, $transformer, int $status = 200)
+    public function item($model, $transformer, $status = 200)
     {
         $data = $transformer->item( $model );
         return $this->respond( $data, $status );
@@ -29,7 +29,7 @@ class Response
      *
      * @return Response
      */
-    public function collection( $collection, $transformer, int $status = 200 )
+    public function collection( $collection, $transformer, $status = 200 )
     {
         $data = $transformer->collection( $collection );
         return $this->respond( $data, $status, $status );
@@ -41,7 +41,7 @@ class Response
      *
      * @return Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function respond( $data, int $status = 200 )
+    protected function respond( $data, $status = 200 )
     {
         return JsonResponse::create( $data, $status );
     }
