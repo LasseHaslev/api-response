@@ -6,7 +6,7 @@ namespace LasseHaslev\ApiResponse\Transformers;
  * Class Transformer
  * @author Lasse S. Haslev
  */
-class Transformer
+class BaseTransformer
 {
 
     use TransformerTrait;
@@ -18,7 +18,7 @@ class Transformer
      */
     public function transform( $model )
     {
-        return $model->attributes();
+        return $model;
     }
 
 

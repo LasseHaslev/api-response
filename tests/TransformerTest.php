@@ -1,7 +1,7 @@
 <?php
 
 use LasseHaslev\ApiResponse\Responses\ResponseTrait;
-use LasseHaslev\ApiResponse\Transformers\Transformer as TransformerBase;
+use LasseHaslev\ApiResponse\Transformers\BaseTransformer;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -78,7 +78,7 @@ class ResponseCaller
     use ResponseTrait;
 }
 
-class Transformer extends TransformerBase
+class Transformer extends BaseTransformer
 {
 
     protected $defaultIncludes = [ 'default' ];
