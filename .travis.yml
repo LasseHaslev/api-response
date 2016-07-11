@@ -6,11 +6,6 @@ php:
   - '7.0'
   - hhvm
 install:
-  - composer install --no-dev --prefer-source --no-interaction
-  - composer require phpunit/phpunit:${PHPUNIT_VERSION}
+  - composer install --no-dev --no-interaction
 
-env:
-  - PHPUNIT_VERSION="5.4.*"
-  - PHPUNIT_VERSION="4.8"
-
-script: vendor/bin/phpunit
+script: phpunit --configuration phpunit.xml --coverage-text
