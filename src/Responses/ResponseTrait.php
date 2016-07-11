@@ -15,7 +15,7 @@ trait ResponseTrait
 
     protected $respond;
 
-    protected $response;
+    protected $responseObject;
 
     /**
      * Get the response factory instance
@@ -24,12 +24,12 @@ trait ResponseTrait
      */
     protected function response()
     {
-        if ( $this->response ) {
-            return $this->response;
+        if ( $this->responseObject ) {
+            return $this->responseObject;
         }
-        $this->response = new Response;
+        $this->responseObject = new Response;
 
-        return $this->response;
+        return $this->responseObject;
     }
 
 
