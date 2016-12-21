@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  * Class DontKnowTest
  * @author Lasse S. Haslev
  */
-class TransformerTest extends PHPUnit_Framework_TestCase
+class TransformerTest extends TestCase
 {
 
     protected $responder;
