@@ -6,4 +6,5 @@
  */
 class ResponderTest extends TestCase
 {
+    // Object passed in has to use CanTransform
 }
